@@ -1,16 +1,19 @@
 :root {
-  --bg: #07030b;
-  --bg-soft: #130719;
-  --purple: #241033;
-  --purple-bright: #6c2ca0;
-  --gold: #f5d47a;
-  --gold-deep: #a87626;
-  --cream: #fff5d0;
-  --muted: #c7b8d7;
-  --danger: #ff8f9f;
-  --glass: rgba(30, 13, 43, 0.72);
-  --border: rgba(245, 212, 122, 0.24);
-  --shadow: 0 24px 90px rgba(0, 0, 0, 0.55);
+  --bg: #1b1714;
+  --bg-soft: #332d27;
+  --purple: #ddd5c8;
+  --purple-bright: #6f665d;
+  --gold: #2b2520;
+  --gold-deep: #7b6f62;
+  --cream: #2a241f;
+  --muted: #6c6258;
+  --danger: #9f4d46;
+  --paper: #eee7d8;
+  --paper-deep: #d7ccb9;
+  --wash: rgba(98, 91, 82, 0.12);
+  --glass: rgba(239, 232, 218, 0.92);
+  --border: rgba(43, 37, 32, 0.28);
+  --shadow: 0 24px 70px rgba(29, 23, 18, 0.3);
 }
 
 * {
@@ -27,9 +30,9 @@ body {
   margin: 0;
   min-height: 100vh;
   background:
-    radial-gradient(circle at 18% 8%, rgba(108, 44, 160, 0.42), transparent 32rem),
-    radial-gradient(circle at 85% 10%, rgba(245, 212, 122, 0.16), transparent 24rem),
-    linear-gradient(145deg, #050207 0%, #130719 52%, #050207 100%);
+    radial-gradient(circle at 17% 9%, rgba(255, 255, 255, 0.18), transparent 22rem),
+    radial-gradient(circle at 84% 12%, rgba(0, 0, 0, 0.2), transparent 26rem),
+    linear-gradient(145deg, #1a1714 0%, #332d27 48%, #171310 100%);
   color: var(--cream);
   font-family:
     Georgia,
@@ -902,4 +905,264 @@ h1 {
     justify-self: start;
     width: 94px;
   }
+}
+
+/* Deck-inspired finishing layer: graphite ink, paper wash, and hand-drawn card edges. */
+body {
+  background:
+    radial-gradient(circle at 20% 8%, rgba(238, 231, 216, 0.18), transparent 18rem),
+    radial-gradient(circle at 82% 18%, rgba(0, 0, 0, 0.22), transparent 28rem),
+    radial-gradient(circle at 18% 82%, rgba(238, 231, 216, 0.1), transparent 22rem),
+    linear-gradient(145deg, #1c1815 0%, #332d27 48%, #15120f 100%);
+}
+
+.app-shell::before {
+  background:
+    radial-gradient(circle, rgba(245, 240, 228, 0.26) 0 1px, transparent 1.4px) 7% 12% / 95px 121px,
+    radial-gradient(circle, rgba(28, 24, 20, 0.34) 0 1px, transparent 1.5px) 80% 16% / 141px 154px,
+    linear-gradient(110deg, transparent 0 48%, rgba(238, 231, 216, 0.05) 49%, transparent 51%);
+  opacity: 0.6;
+}
+
+.app-shell::after {
+  background:
+    radial-gradient(circle at 43% 36%, rgba(240, 234, 222, 0.9) 0 9%, transparent 10%),
+    radial-gradient(circle at 58% 37%, rgba(240, 234, 222, 0.9) 0 9%, transparent 10%),
+    radial-gradient(circle at 50% 59%, rgba(240, 234, 222, 0.9) 0 15%, transparent 16%),
+    #15120f;
+  border-color: rgba(239, 232, 218, 0.22);
+  box-shadow: 0 0 70px rgba(0, 0, 0, 0.26);
+  opacity: 0.72;
+}
+
+.hero,
+.panel,
+.selected-card,
+.identification-panel,
+.reading-result {
+  background:
+    linear-gradient(105deg, rgba(255, 255, 255, 0.32), transparent 34%),
+    radial-gradient(circle at 12% 8%, rgba(255, 255, 255, 0.42), transparent 11rem),
+    radial-gradient(circle at 82% 88%, rgba(51, 45, 39, 0.12), transparent 14rem),
+    var(--paper);
+  border-color: rgba(43, 37, 32, 0.34);
+  box-shadow:
+    0 22px 58px rgba(16, 13, 11, 0.3),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.34),
+    inset 0 0 70px rgba(99, 88, 74, 0.12);
+}
+
+.hero {
+  min-height: 390px;
+}
+
+.hero::before {
+  background:
+    linear-gradient(90deg, transparent 0 49%, rgba(43, 37, 32, 0.18) 49.4%, transparent 50.2%),
+    linear-gradient(0deg, transparent 0 49%, rgba(43, 37, 32, 0.1) 49.4%, transparent 50.2%),
+    radial-gradient(circle at 77% 58%, rgba(43, 37, 32, 0.12), transparent 17rem);
+  opacity: 0.5;
+}
+
+.hero::after {
+  background:
+    linear-gradient(165deg, transparent 0 39%, rgba(235, 228, 214, 0.95) 40% 100%),
+    radial-gradient(circle at 50% 18%, rgba(43, 37, 32, 0.72), transparent 2px),
+    radial-gradient(circle at 50% 78%, rgba(43, 37, 32, 0.18), transparent 95px);
+  border-color: rgba(43, 37, 32, 0.28);
+  border-radius: 14px 17px 15px 18px;
+  box-shadow:
+    0 16px 36px rgba(29, 23, 18, 0.22),
+    inset 0 0 18px rgba(43, 37, 32, 0.08);
+  filter: grayscale(1);
+}
+
+.moon {
+  background:
+    radial-gradient(circle at 36% 40%, transparent 0 31%, var(--paper) 32% 52%, transparent 53%),
+    radial-gradient(circle, #2b2520 0 54%, rgba(43, 37, 32, 0.28) 65%, transparent 66%);
+  box-shadow: 0 0 34px rgba(43, 37, 32, 0.18);
+  opacity: 0.5;
+}
+
+.stars::before,
+.stars::after {
+  background: rgba(43, 37, 32, 0.72);
+  box-shadow:
+    44px 62px 0 rgba(43, 37, 32, 0.4),
+    112px 28px 0 rgba(43, 37, 32, 0.5),
+    212px 92px 0 rgba(43, 37, 32, 0.32),
+    318px 44px 0 rgba(43, 37, 32, 0.38),
+    430px 114px 0 rgba(43, 37, 32, 0.45);
+}
+
+.eyebrow,
+.panel-heading h2,
+h1,
+.selected-card h3,
+.identification-panel h3,
+.reading-result h3,
+.rituals h4,
+.reading-cards span,
+.identified-card strong,
+.match-confidence {
+  color: #2b2520;
+}
+
+.hero-copy,
+.panel-heading p:last-child,
+.manual-card-field p,
+.spread-card p,
+.reading-result p,
+.identified-card p,
+.caveat,
+.rituals ul,
+.card-chip small {
+  color: #6f655b;
+}
+
+h1,
+.panel-heading h2,
+.selected-card h3,
+.identification-panel h3,
+.reading-result h3 {
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.38);
+}
+
+.panel::before {
+  background:
+    linear-gradient(90deg, transparent, rgba(43, 37, 32, 0.32), transparent),
+    radial-gradient(circle, rgba(43, 37, 32, 0.18), transparent 54%);
+}
+
+.search-input,
+.reading-form select,
+.reading-form textarea {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.42), transparent),
+    #f6f0e4;
+  border-color: rgba(43, 37, 32, 0.28);
+  box-shadow: inset 0 1px 8px rgba(43, 37, 32, 0.07);
+  color: #2b2520;
+}
+
+.search-input::placeholder,
+.reading-form textarea::placeholder {
+  color: #8a7d6e;
+}
+
+.search-input:focus,
+.reading-form select:focus,
+.reading-form textarea:focus {
+  border-color: rgba(43, 37, 32, 0.72);
+  box-shadow: 0 0 0 4px rgba(43, 37, 32, 0.1), inset 0 1px 8px rgba(43, 37, 32, 0.07);
+}
+
+.card-chip,
+.spread-card,
+.identified-card,
+.reading-cards article {
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.5), transparent 46%),
+    #e8dfcf;
+  border-color: rgba(43, 37, 32, 0.28);
+  box-shadow:
+    0 14px 28px rgba(29, 23, 18, 0.16),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.32);
+}
+
+.card-chip {
+  border-radius: 12px 15px 13px 16px;
+}
+
+.card-chip:hover,
+.card-chip.active {
+  border-color: rgba(43, 37, 32, 0.78);
+  box-shadow:
+    0 16px 32px rgba(29, 23, 18, 0.2),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.42);
+}
+
+.card-chip-image,
+.deck-card-frame,
+.identified-card-art,
+.image-preview {
+  background:
+    radial-gradient(circle at 42% 18%, rgba(255, 255, 255, 0.28), transparent 36%),
+    #d5ccb9;
+  border-color: rgba(43, 37, 32, 0.36);
+  box-shadow:
+    0 14px 28px rgba(29, 23, 18, 0.22),
+    inset 0 0 20px rgba(43, 37, 32, 0.08);
+  filter: grayscale(0.1) contrast(1.04);
+}
+
+.deck-card-frame {
+  border-radius: 14px 17px 15px 18px;
+}
+
+.deck-card-image,
+.card-chip-image,
+.identified-card-art img {
+  filter: grayscale(1) contrast(1.05);
+}
+
+.manual-card-field {
+  border-left-color: rgba(43, 37, 32, 0.34);
+}
+
+.manual-card-field strong,
+.identified-card label,
+.keywords span {
+  color: #3a332d;
+}
+
+.keywords span {
+  background: rgba(43, 37, 32, 0.06);
+  border-color: rgba(43, 37, 32, 0.22);
+}
+
+.cat-guidance {
+  color: #3c342e;
+}
+
+.upload-box {
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.48), transparent),
+    #e5dcca;
+  border-color: rgba(43, 37, 32, 0.36);
+  color: #2b2520;
+}
+
+.upload-box small,
+.spread-card li span {
+  color: #6f655b;
+}
+
+.upload-icon,
+.primary-button {
+  background:
+    linear-gradient(180deg, #3d352e, #1d1814);
+  border: 1px solid rgba(43, 37, 32, 0.64);
+  color: #f4ecdd;
+  box-shadow:
+    0 12px 28px rgba(29, 23, 18, 0.24),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18);
+}
+
+.primary-button:hover:not(:disabled) {
+  box-shadow:
+    0 16px 34px rgba(29, 23, 18, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22);
+}
+
+.error-message {
+  background: rgba(159, 77, 70, 0.12);
+  border-color: rgba(159, 77, 70, 0.32);
+  color: #73312d;
+}
+
+.rituals,
+.caveat {
+  border-top-color: rgba(43, 37, 32, 0.18);
 }
