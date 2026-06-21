@@ -1,5 +1,6 @@
 "use client";
 
+import NextImage from "next/image";
 import { useEffect, useMemo, useState } from "react";
 import { spreads } from "@/lib/spreads";
 import { tarotCards, type TarotCard } from "@/lib/tarot";
@@ -15,6 +16,21 @@ type ReadingResult = {
   overallMessage: string;
   cards: ReadingCard[];
   rituals: string[];
+  caveat: string;
+};
+
+type IdentifiedCard = {
+  positionNumber: number;
+  position: string;
+  observedCard: string;
+  orientation: "upright" | "reversed" | "unknown";
+  confidence: number;
+  visualEvidence: string;
+};
+
+type IdentifyResult = {
+  spreadName: string;
+  cards: IdentifiedCard[];
   caveat: string;
 };
 
@@ -35,14 +51,14 @@ function readFileAsDataUrl(file: File) {
 
 function loadImage(dataUrl: string) {
   return new Promise<HTMLImageElement>((resolve, reject) => {
-    const image = new Image();
+    const image = new window.Image();
     image.onload = () => resolve(image);
     image.onerror = () => reject(new Error("Could not load the selected image."));
     image.src = dataUrl;
   });
 }
 
-async function compressImage(file: File, maxDimension = 1400, quality = 0.82) {
+async function compressImage(file: File, maxDimension = 1800, quality = 0.86) {
   const dataUrl = await readFileAsDataUrl(file);
   const image = await loadImage(dataUrl);
   const scale = Math.min(1, maxDimension / Math.max(image.width, image.height));
@@ -61,23 +77,6 @@ async function compressImage(file: File, maxDimension = 1400, quality = 0.82) {
   return canvas.toDataURL("image/jpeg", quality);
 }
 
-function CardSigil({ card }: { card: TarotCard }) {
-  const initials = card.name
-    .split(" ")
-    .filter((part) => part !== "of" && part !== "The")
-    .map((part) => part[0])
-    .slice(0, 2)
-    .join("");
-
-  return (
-    <div className="card-sigil" aria-hidden="true">
-      <span className="sigil-moon" />
-      <strong>{initials}</strong>
-      <span className="sigil-paw" />
-    </div>
-  );
-}
-
 export function CatTarotApp() {
   const [query, setQuery] = useState("");
   const [selectedCard, setSelectedCard] = useState<TarotCard>(initialCard);
@@ -86,8 +85,11 @@ export function CatTarotApp() {
   const [imageDataUrl, setImageDataUrl] = useState("");
   const [imageName, setImageName] = useState("");
   const [isPreparingImage, setIsPreparingImage] = useState(false);
+  const [isIdentifying, setIsIdentifying] = useState(false);
   const [isReading, setIsReading] = useState(false);
   const [error, setError] = useState("");
+  const [identificationCaveat, setIdentificationCaveat] = useState("");
+  const [identifiedCards, setIdentifiedCards] = useState<IdentifiedCard[]>([]);
   const [result, setResult] = useState<ReadingResult | null>(null);
 
   useEffect(() => {
@@ -103,6 +105,8 @@ export function CatTarotApp() {
     [spreadId],
   );
 
+  const cardByName = useMemo(() => new Map(tarotCards.map((card) => [card.name, card])), []);
+
   const filteredCards = useMemo(() => {
     const needle = normalize(query);
     if (!needle) {
@@ -117,14 +121,20 @@ export function CatTarotApp() {
     });
   }, [query]);
 
+  function resetReadingState() {
+    setError("");
+    setResult(null);
+    setIdentifiedCards([]);
+    setIdentificationCaveat("");
+  }
+
   async function handleImageChange(event: React.ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
     if (!file) {
       return;
     }
 
-    setError("");
-    setResult(null);
+    resetReadingState();
     setIsPreparingImage(true);
 
     try {
@@ -138,8 +148,46 @@ export function CatTarotApp() {
     }
   }
 
-  async function handleReadingSubmit(event: React.FormEvent<HTMLFormElement>) {
+  function updateIdentifiedCard(index: number, patch: Partial<IdentifiedCard>) {
+    setIdentifiedCards((current) =>
+      current.map((card, cardIndex) => (cardIndex === index ? { ...card, ...patch } : card)),
+    );
+    setResult(null);
+  }
+
+  async function handleIdentifySubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    resetReadingState();
+
+    if (!imageDataUrl) {
+      setError("Upload or capture a spread photo before asking for identification.");
+      return;
+    }
+
+    setIsIdentifying(true);
+    try {
+      const response = await fetch("/api/identify-spread", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ imageDataUrl, spreadId, question }),
+      });
+      const payload = await response.json();
+
+      if (!response.ok) {
+        throw new Error(payload.error || "The familiar could not identify the spread. Try again.");
+      }
+
+      const identifyResult = payload as IdentifyResult;
+      setIdentifiedCards(identifyResult.cards);
+      setIdentificationCaveat(identifyResult.caveat);
+    } catch (caughtError) {
+      setError(caughtError instanceof Error ? caughtError.message : "Could not identify the spread.");
+    } finally {
+      setIsIdentifying(false);
+    }
+  }
+
+  async function handleReadingSubmit() {
     setError("");
     setResult(null);
 
@@ -148,12 +196,24 @@ export function CatTarotApp() {
       return;
     }
 
+    if (!identifiedCards.length) {
+      setError("Identify and confirm the cards before generating the reading.");
+      return;
+    }
+
+    const confirmedCards = identifiedCards.map((card) => ({
+      positionNumber: card.positionNumber,
+      position: card.position,
+      cardName: card.observedCard,
+      orientation: card.orientation,
+    }));
+
     setIsReading(true);
     try {
       const response = await fetch("/api/read-spread", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ imageDataUrl, spreadId, question }),
+        body: JSON.stringify({ imageDataUrl, spreadId, question, confirmedCards }),
       });
       const payload = await response.json();
 
@@ -177,8 +237,8 @@ export function CatTarotApp() {
         <p className="eyebrow">Cat Tarot Companion</p>
         <h1 id="app-title">Moonlit readings for curious souls and familiar spirits.</h1>
         <p className="hero-copy">
-          Browse all 78 cards, then ask the camera oracle to interpret your spread with a little
-          velvet-pawed intuition.
+          Browse all 78 cards, then ask the camera oracle to compare your spread against the real
+          deck artwork before interpreting it.
         </p>
       </section>
 
@@ -187,7 +247,7 @@ export function CatTarotApp() {
           <div className="panel-heading">
             <p className="eyebrow">01 / Grimoire</p>
             <h2>Simple Card Lookup</h2>
-            <p>Search by card, suit, arcana, or keyword.</p>
+            <p>Search by card, suit, arcana, keyword, guidebook meaning, or visual detail.</p>
           </div>
 
           <label className="search-label" htmlFor="card-search">
@@ -198,7 +258,7 @@ export function CatTarotApp() {
             className="search-input"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            placeholder="Try Moon, courage, Cups, or The Fool"
+            placeholder="Try meadow, white rose, Cups, or The Fool"
             type="search"
           />
 
@@ -217,7 +277,16 @@ export function CatTarotApp() {
           </div>
 
           <div className="selected-card">
-            <CardSigil card={selectedCard} />
+            <div className="deck-card-frame">
+              <NextImage
+                alt={`${selectedCard.name} card artwork`}
+                className="deck-card-image"
+                height={640}
+                priority
+                src={selectedCard.image}
+                width={420}
+              />
+            </div>
             <div>
               <p className="eyebrow">{selectedCard.arcana}</p>
               <h3>{selectedCard.name}</h3>
@@ -247,17 +316,20 @@ export function CatTarotApp() {
           <div className="panel-heading">
             <p className="eyebrow">02 / Camera Oracle</p>
             <h2>Spread Photo Reading</h2>
-            <p>Choose a guide spread, photograph the cards, and receive a structured reading.</p>
+            <p>
+              Identify cards against the real deck artwork, correct any uncertain guesses, then ask
+              for the reading.
+            </p>
           </div>
 
-          <form className="reading-form" onSubmit={handleReadingSubmit}>
+          <form className="reading-form" onSubmit={handleIdentifySubmit}>
             <label htmlFor="spread">Spread type</label>
             <select
               id="spread"
               value={spreadId}
               onChange={(event) => {
                 setSpreadId(event.target.value);
-                setResult(null);
+                resetReadingState();
               }}
             >
               {spreads.map((spread) => (
@@ -307,7 +379,7 @@ export function CatTarotApp() {
               <small>
                 {isPreparingImage
                   ? "Polishing moonlight from the image..."
-                  : "Photos are resized in your browser before upload."}
+                  : "Photos are resized in your browser before deck comparison."}
               </small>
             </label>
 
@@ -319,12 +391,89 @@ export function CatTarotApp() {
               />
             ) : null}
 
-            <button className="primary-button" disabled={isReading || isPreparingImage} type="submit">
-              {isReading ? "Reading the spread..." : "Read My Spread"}
+            <button className="primary-button" disabled={isIdentifying || isPreparingImage} type="submit">
+              {isIdentifying ? "Comparing with deck art..." : "Identify Cards"}
             </button>
           </form>
 
           {error ? <p className="error-message">{error}</p> : null}
+
+          {identifiedCards.length ? (
+            <section className="identification-panel" aria-live="polite">
+              <p className="eyebrow">Deck Match Review</p>
+              <h3>Confirm the Cards</h3>
+              <p>
+                The app compared your photo with a reference sheet of all 78 extracted card images.
+                Review each guess before generating the reading.
+              </p>
+              <div className="identified-card-list">
+                {identifiedCards.map((card, index) => {
+                  const matchedCard = cardByName.get(card.observedCard);
+                  return (
+                    <article key={card.positionNumber} className="identified-card">
+                      <div className="identified-card-art">
+                        {matchedCard ? (
+                          <NextImage
+                            alt={`${matchedCard.name} card artwork`}
+                            height={220}
+                            src={matchedCard.image}
+                            width={150}
+                          />
+                        ) : (
+                          <span>?</span>
+                        )}
+                      </div>
+                      <div>
+                        <strong>{card.position}</strong>
+                        <label htmlFor={`card-${card.positionNumber}`}>Card</label>
+                        <select
+                          id={`card-${card.positionNumber}`}
+                          value={card.observedCard}
+                          onChange={(event) =>
+                            updateIdentifiedCard(index, { observedCard: event.target.value })
+                          }
+                        >
+                          <option value="Unknown">Unknown</option>
+                          {tarotCards.map((tarotCard) => (
+                            <option key={tarotCard.name} value={tarotCard.name}>
+                              {tarotCard.name}
+                            </option>
+                          ))}
+                        </select>
+                        <label htmlFor={`orientation-${card.positionNumber}`}>Orientation</label>
+                        <select
+                          id={`orientation-${card.positionNumber}`}
+                          value={card.orientation}
+                          onChange={(event) =>
+                            updateIdentifiedCard(index, {
+                              orientation: event.target.value as IdentifiedCard["orientation"],
+                            })
+                          }
+                        >
+                          <option value="upright">Upright</option>
+                          <option value="reversed">Reversed</option>
+                          <option value="unknown">Unknown</option>
+                        </select>
+                        <p className="match-confidence">
+                          Confidence: {Math.round(Math.max(0, Math.min(1, card.confidence)) * 100)}%
+                        </p>
+                        <p>{card.visualEvidence}</p>
+                      </div>
+                    </article>
+                  );
+                })}
+              </div>
+              {identificationCaveat ? <p className="caveat">{identificationCaveat}</p> : null}
+              <button
+                className="primary-button"
+                disabled={isReading || isIdentifying}
+                onClick={handleReadingSubmit}
+                type="button"
+              >
+                {isReading ? "Reading the confirmed spread..." : "Generate Reading From Confirmed Cards"}
+              </button>
+            </section>
+          ) : null}
 
           {result ? (
             <section className="reading-result" aria-live="polite">

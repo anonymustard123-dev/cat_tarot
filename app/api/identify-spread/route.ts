@@ -1,22 +1,28 @@
+import { readFile } from "node:fs/promises";
+import path from "node:path";
 import { NextResponse } from "next/server";
 import { getSpread } from "@/lib/spreads";
 import { buildDeckReference } from "@/lib/tarot";
 
-type ConfirmedCard = {
-  positionNumber?: number;
-  position?: string;
-  cardName?: string;
-  orientation?: "upright" | "reversed" | "unknown";
-};
-
-type ReadSpreadRequest = {
+type IdentifySpreadRequest = {
   imageDataUrl?: string;
   spreadId?: string;
   question?: string;
-  confirmedCards?: ConfirmedCard[];
 };
 
 const openAiUrl = "https://api.openai.com/v1/chat/completions";
+let deckReferenceDataUrl: string | null = null;
+
+async function getDeckReferenceDataUrl() {
+  if (deckReferenceDataUrl) {
+    return deckReferenceDataUrl;
+  }
+
+  const imagePath = path.join(process.cwd(), "public", "cards", "deck-reference.webp");
+  const buffer = await readFile(imagePath);
+  deckReferenceDataUrl = `data:image/webp;base64,${buffer.toString("base64")}`;
+  return deckReferenceDataUrl;
+}
 
 export async function POST(request: Request) {
   const apiKey = process.env.OPENAI_API_KEY;
@@ -25,15 +31,15 @@ export async function POST(request: Request) {
     return NextResponse.json(
       {
         error:
-          "Missing OPENAI_API_KEY. Add it to your local environment or Vercel project settings before requesting a photo reading.",
+          "Missing OPENAI_API_KEY. Add it to your local environment or Vercel project settings before requesting card identification.",
       },
       { status: 500 },
     );
   }
 
-  let body: ReadSpreadRequest;
+  let body: IdentifySpreadRequest;
   try {
-    body = (await request.json()) as ReadSpreadRequest;
+    body = (await request.json()) as IdentifySpreadRequest;
   } catch {
     return NextResponse.json({ error: "Request body must be valid JSON." }, { status: 400 });
   }
@@ -60,45 +66,44 @@ export async function POST(request: Request) {
   const positionGuide = spread.positions
     .map((position) => `${position.number}. ${position.title}: ${position.meaning}`)
     .join("\n");
-  const confirmedCards = Array.isArray(body.confirmedCards) ? body.confirmedCards : [];
-  const confirmedCardsText = confirmedCards.length
-    ? confirmedCards
-        .map(
-          (card) =>
-            `${card.positionNumber ?? "?"}. ${card.position || "Position"}: ${card.cardName || "Unknown"} (${card.orientation || "unknown"})`,
-        )
-        .join("\n")
-    : "No confirmed cards were provided. Make the best visual identification you can from the image.";
-  const model = process.env.OPENAI_MODEL || "gpt-4o-mini";
   const deckReference = buildDeckReference();
+  const referenceImage = await getDeckReferenceDataUrl();
+  const model = process.env.OPENAI_MODEL || "gpt-4o-mini";
 
-  const prompt = `You are Cat Tarot Companion, a warm but grounded tarot interpreter with a celestial black-cat aesthetic.
+  const prompt = `You are identifying cards from a specific Cat Tarot deck, not a generic tarot deck.
 
-Use the selected spread metadata exactly:
-Spread: ${spread.name} (${spread.nickname})
+You will receive two images:
+1. A labeled reference sheet containing all 78 cards from this exact deck.
+2. The user's spread photo.
+
+Compare the user's spread photo against the labeled reference sheet. Use the guidebook text below as secondary support, but the reference sheet image is the primary source for visual matching.
+
+Selected spread: ${spread.name} (${spread.nickname})
 Positions:
 ${positionGuide}
 ${spread.note ? `Special note: ${spread.note}` : ""}
 Question: ${body.question?.trim() || "No specific question provided."}
 
-Confirmed cards from the user review step. Treat these as authoritative, even if the photo looks ambiguous:
-${confirmedCardsText}
-
-Deck-specific guidebook reference from OCR/manual summaries. Use these meanings instead of generic tarot interpretations:
+Guidebook reference:
 ${deckReference}
 
 Return only JSON with this exact shape:
 {
   "spreadName": "${spread.name} (${spread.nickname})",
-  "overallMessage": "2-4 sentence synthesis",
   "cards": [
-    { "position": "1. Position title", "observedCard": "Card name plus orientation", "interpretation": "position-specific interpretation based on the confirmed card and guidebook" }
+    {
+      "positionNumber": 1,
+      "position": "1. Position title",
+      "observedCard": "Card name from the reference sheet or Unknown",
+      "orientation": "upright | reversed | unknown",
+      "confidence": 0.0,
+      "visualEvidence": "short explanation of the visual match or uncertainty"
+    }
   ],
-  "rituals": ["short grounding ritual", "short integration ritual"],
-  "caveat": "A short note that tarot is reflective guidance, not certainty."
+  "caveat": "A short note that the user should confirm guesses before the reading."
 }
 
-There must be exactly ${spread.positions.length} cards in the cards array, one per position. If confirmed cards are provided, do not change them. If a card is Unknown, interpret the position carefully and acknowledge uncertainty. Keep it kind, concise, and cat-themed.`;
+There must be exactly ${spread.positions.length} cards in the cards array, one per position. Use confidence values from 0 to 1. If a card is unclear, use "Unknown" and a low confidence. Do not invent cards outside the reference sheet.`;
 
   const response = await fetch(openAiUrl, {
     method: "POST",
@@ -117,14 +122,21 @@ There must be exactly ${spread.positions.length} cards in the cards array, one p
             {
               type: "image_url",
               image_url: {
+                url: referenceImage,
+                detail: "high",
+              },
+            },
+            {
+              type: "image_url",
+              image_url: {
                 url: body.imageDataUrl,
-                detail: "low",
+                detail: "high",
               },
             },
           ],
         },
       ],
-      temperature: 0.7,
+      temperature: 0.2,
     }),
   });
 
@@ -133,7 +145,7 @@ There must be exactly ${spread.positions.length} cards in the cards array, one p
   if (!response.ok) {
     const message =
       responseBody?.error?.message ||
-      "OpenAI could not complete the spread reading. Check the model name and API key.";
+      "OpenAI could not identify the spread. Check the model name and API key.";
     return NextResponse.json({ error: message }, { status: response.status });
   }
 
