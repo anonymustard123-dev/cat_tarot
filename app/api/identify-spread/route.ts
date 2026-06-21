@@ -13,6 +13,33 @@ type IdentifySpreadRequest = {
 const openAiUrl = "https://api.openai.com/v1/chat/completions";
 let deckReferenceDataUrl: string | null = null;
 
+const minorArcanaIdentifierGuide = `
+Minor arcana identification shortcut for this physical deck:
+- The bottom-left corner is the strongest identifier for numbered minor arcana cards.
+- First read the suit glyph in the bottom-left corner:
+  - Cups: a cup/bowl-like semicircle glyph.
+  - Swords: a triangle glyph.
+  - Pentacles: a circle glyph.
+  - Wands: a curled wand/toy/fire glyph, visually more curved/looped than the other suit marks.
+- Then read the nearby Roman numeral/rank:
+  - I or Ace = Ace
+  - II = Two
+  - III = Three
+  - IV = Four
+  - V = Five
+  - VI = Six
+  - VII = Seven
+  - VIII = Eight
+  - IX = Nine
+  - X = Ten
+- Examples from the real cards:
+  - VII plus the cup/bowl semicircle glyph means Seven of Cups.
+  - V plus the circle glyph means Five of Pentacles.
+  - VI plus the triangle glyph means Six of Swords.
+- For Page, Knight, Queen, and King cards, use title text/artwork/reference-sheet comparison because the bottom-left numeral shortcut may not apply.
+- If the bottom-left glyph and numeral are clear, trust that combination more than the central cat scene, because the minor card artwork can be visually similar across suits.
+`;
+
 async function getDeckReferenceDataUrl() {
   if (deckReferenceDataUrl) {
     return deckReferenceDataUrl;
@@ -77,6 +104,10 @@ You will receive two images:
 2. The user's spread photo.
 
 Compare the user's spread photo against the labeled reference sheet. Use the guidebook text below as secondary support, but the reference sheet image is the primary source for visual matching.
+
+${minorArcanaIdentifierGuide}
+
+For minor arcana cards, explicitly inspect the bottom-left corner before choosing a card. If you use the corner glyph/rank, mention it in visualEvidence, for example "bottom-left VI plus triangle glyph".
 
 Selected spread: ${spread.name} (${spread.nickname})
 Positions:
