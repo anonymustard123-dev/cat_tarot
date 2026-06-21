@@ -1446,3 +1446,141 @@ h1,
 .caveat {
   border-top-color: rgba(247, 220, 255, 0.18);
 }
+
+.app-shell {
+  z-index: 1;
+}
+
+body::before {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 160 160' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.78' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+  content: "";
+  inset: 0;
+  mix-blend-mode: soft-light;
+  opacity: 0.18;
+  pointer-events: none;
+  position: fixed;
+  z-index: 0;
+}
+
+.hero .eyebrow {
+  letter-spacing: 0.28em;
+}
+
+.hero h1 {
+  font-size: clamp(2.25rem, 6.8vw, 5.5rem);
+  font-weight: 600;
+  letter-spacing: -0.045em;
+  line-height: 1.03;
+  max-width: 920px;
+}
+
+.hero-copy {
+  font-size: clamp(1rem, 2.1vw, 1.22rem);
+  line-height: 1.9;
+  max-width: 690px;
+}
+
+.peeping-cat {
+  animation: peek-bob 5.8s ease-in-out infinite;
+  aspect-ratio: 1;
+  background:
+    radial-gradient(circle at 35% 43%, #fff1a8 0 3.5%, transparent 4%),
+    radial-gradient(circle at 64% 43%, #fff1a8 0 3.5%, transparent 4%),
+    radial-gradient(circle at 35% 43%, #16072f 0 7%, transparent 7.6%),
+    radial-gradient(circle at 64% 43%, #16072f 0 7%, transparent 7.6%),
+    radial-gradient(ellipse at 50% 62%, #ffbfdc 0 7%, transparent 7.8%),
+    radial-gradient(circle at 50% 48%, #24104d 0 60%, #15072f 61% 100%);
+  border: 1px solid rgba(255, 241, 168, 0.26);
+  border-radius: 48% 48% 42% 42%;
+  bottom: -30px;
+  box-shadow:
+    0 0 36px rgba(255, 185, 221, 0.26),
+    inset 0 0 26px rgba(255, 255, 255, 0.08);
+  height: clamp(92px, 13vw, 150px);
+  pointer-events: none;
+  position: absolute;
+  right: clamp(18px, 5vw, 72px);
+  transform: rotate(-5deg);
+  z-index: 2;
+}
+
+.peeping-cat::before,
+.peeping-cat::after {
+  background: linear-gradient(135deg, #21104a, #110627);
+  border: 1px solid rgba(255, 241, 168, 0.2);
+  content: "";
+  height: 43%;
+  position: absolute;
+  top: -17%;
+  transform: rotate(45deg);
+  width: 43%;
+  z-index: -1;
+}
+
+.peeping-cat::before {
+  left: 8%;
+}
+
+.peeping-cat::after {
+  right: 8%;
+}
+
+@keyframes peek-bob {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-5deg);
+  }
+
+  50% {
+    transform: translateY(-10px) rotate(-2deg);
+  }
+}
+
+.card-chip,
+.deck-card-frame,
+.identified-card-art {
+  border-radius: 16px;
+  transform-origin: 50% 86%;
+  transition:
+    box-shadow 220ms ease,
+    transform 220ms ease,
+    border-color 220ms ease;
+}
+
+.card-chip:hover,
+.card-chip.active {
+  transform: translateY(-4px) rotate(-1.2deg);
+}
+
+.deck-card-frame:hover,
+.identified-card:hover .identified-card-art {
+  border-color: rgba(255, 241, 168, 0.52);
+  box-shadow:
+    0 28px 62px rgba(8, 3, 28, 0.44),
+    0 0 34px rgba(255, 185, 221, 0.2),
+    inset 0 0 24px rgba(255, 255, 255, 0.08);
+  transform: translateY(-5px) rotate(0.8deg);
+}
+
+.card-chip-image,
+.deck-card-image,
+.identified-card-art img {
+  border-radius: 10px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .peeping-cat,
+  .card-chip,
+  .deck-card-frame,
+  .identified-card-art {
+    animation: none;
+    transition: none;
+  }
+
+  .card-chip:hover,
+  .card-chip.active,
+  .deck-card-frame:hover,
+  .identified-card:hover .identified-card-art {
+    transform: none;
+  }
+}

@@ -234,6 +234,7 @@ export function CatTarotApp() {
       <section className="hero" aria-labelledby="app-title">
         <div className="moon" aria-hidden="true" />
         <div className="stars" aria-hidden="true" />
+        <div className="peeping-cat" aria-hidden="true" />
         <p className="eyebrow">Cat Tarot Companion</p>
         <h1 id="app-title">
           Seek answers to the past, purr-esent, and future. Tap into feline wisdom and playful
