@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192" role="img" aria-label="Cat Tarot Companion icon">
+  <rect width="192" height="192" rx="42" fill="#07030b"/>
+  <circle cx="96" cy="82" r="58" fill="#f5d47a" opacity="0.2"/>
+  <path d="M62 72 77 36l15 28h8l15-28 15 36c13 11 21 28 21 47 0 34-25 56-55 56s-55-22-55-56c0-19 8-36 21-47Z" fill="#120718" stroke="#f5d47a" stroke-width="4" stroke-linejoin="round"/>
+  <circle cx="79" cy="105" r="6" fill="#f5d47a"/>
+  <circle cx="113" cy="105" r="6" fill="#f5d47a"/>
+  <path d="M96 117c-6 0-11 3-11 7s5 7 11 7 11-3 11-7-5-7-11-7Z" fill="#f5d47a"/>
+  <path d="M64 132c17 13 47 13 64 0" fill="none" stroke="#f5d47a" stroke-width="4" stroke-linecap="round"/>
+  <path d="M144 35c-18 6-29 24-27 43 14-7 24-20 27-43Z" fill="#fff5d0"/>
+</svg>
