@@ -1,4 +1,4 @@
-const CACHE_NAME = "cat-tarot-v3";
+const CACHE_NAME = "cat-tarot-v4";
 const APP_SHELL = ["/", "/manifest.json", "/icon.svg", "/icon-192.svg", "/icon-512.svg"];
 
 self.addEventListener("install", (event) => {

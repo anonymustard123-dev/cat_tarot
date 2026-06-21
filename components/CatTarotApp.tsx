@@ -235,7 +235,10 @@ export function CatTarotApp() {
         <div className="moon" aria-hidden="true" />
         <div className="stars" aria-hidden="true" />
         <p className="eyebrow">Cat Tarot Companion</p>
-        <h1 id="app-title">Moonlit readings for curious souls and familiar spirits.</h1>
+        <h1 id="app-title">
+          Seek answers to the past, purr-esent, and future. Tap into feline wisdom and playful
+          psychic abilities with your Cat Tarot companion.
+        </h1>
         <p className="hero-copy">
           Browse all 78 cards, then ask the camera oracle to compare your spread against the real
           deck artwork before interpreting it.
@@ -353,9 +356,7 @@ export function CatTarotApp() {
               <ol>
                 {selectedSpread.positions.map((position) => (
                   <li key={position.number}>
-                    <strong>
-                      {position.number}. {position.title}
-                    </strong>
+                    <strong>{position.title}</strong>
                     <span>{position.meaning}</span>
                   </li>
                 ))}
