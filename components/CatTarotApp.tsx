@@ -270,6 +270,14 @@ export function CatTarotApp() {
                 onClick={() => setSelectedCard(card)}
                 type="button"
               >
+                <NextImage
+                  alt=""
+                  aria-hidden="true"
+                  className="card-chip-image"
+                  height={120}
+                  src={card.image}
+                  width={80}
+                />
                 <span>{card.name}</span>
                 <small>{card.arcana}</small>
               </button>
