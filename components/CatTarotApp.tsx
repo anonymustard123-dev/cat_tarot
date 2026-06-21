@@ -234,12 +234,20 @@ export function CatTarotApp() {
       <section className="hero" aria-labelledby="app-title">
         <div className="moon" aria-hidden="true" />
         <div className="stars" aria-hidden="true" />
-        <div className="peeping-cat" aria-hidden="true" />
-        <p className="eyebrow">Cat Tarot Companion</p>
-        <h1 id="app-title">
-          Seek answers to the past, purr-esent, and future. Tap into feline wisdom and playful
-          psychic abilities with your Cat Tarot companion.
-        </h1>
+        <div className="hero-brand">
+          <NextImage
+            alt="Cat Tarot logo"
+            className="brand-logo"
+            height={160}
+            priority
+            src="/cat-tarot-logo.png"
+            width={96}
+          />
+          <div>
+            <p className="eyebrow">Cat Tarot Companion</p>
+            <h1 id="app-title">Deck lookup and camera oracle</h1>
+          </div>
+        </div>
         <p className="hero-copy">
           Browse all 78 cards, then ask the camera oracle to compare your spread against the real
           deck artwork before interpreting it.

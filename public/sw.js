@@ -1,5 +1,12 @@
-const CACHE_NAME = "cat-tarot-v6";
-const APP_SHELL = ["/", "/manifest.json", "/icon.svg", "/icon-192.svg", "/icon-512.svg"];
+const CACHE_NAME = "cat-tarot-v7";
+const APP_SHELL = [
+  "/",
+  "/manifest.json",
+  "/icon.svg",
+  "/icon-192.svg",
+  "/icon-512.svg",
+  "/cat-tarot-logo.png",
+];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(APP_SHELL)));
