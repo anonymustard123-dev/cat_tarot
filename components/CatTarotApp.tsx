@@ -111,7 +111,7 @@ export function CatTarotApp() {
 
     return tarotCards.filter((card) => {
       const haystack = normalize(
-        `${card.name} ${card.arcana} ${card.keywords.join(" ")} ${card.meaning}`,
+        `${card.name} ${card.arcana} ${card.keywords.join(" ")} ${card.appearance} ${card.upright} ${card.reversed} ${card.catGuidance}`,
       );
       return haystack.includes(needle);
     });
@@ -221,11 +221,22 @@ export function CatTarotApp() {
             <div>
               <p className="eyebrow">{selectedCard.arcana}</p>
               <h3>{selectedCard.name}</h3>
-              <p className="meaning">{selectedCard.meaning}</p>
               <div className="keywords">
                 {selectedCard.keywords.map((keyword) => (
                   <span key={keyword}>{keyword}</span>
                 ))}
+              </div>
+              <div className="manual-card-field">
+                <strong>Manual imagery</strong>
+                <p>{selectedCard.appearance}</p>
+              </div>
+              <div className="manual-card-field">
+                <strong>Upright reading</strong>
+                <p>{selectedCard.upright}</p>
+              </div>
+              <div className="manual-card-field">
+                <strong>Reversed reading</strong>
+                <p>{selectedCard.reversed}</p>
               </div>
               <p className="cat-guidance">{selectedCard.catGuidance}</p>
             </div>

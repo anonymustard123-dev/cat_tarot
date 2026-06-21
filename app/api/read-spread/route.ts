@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getSpread } from "@/lib/spreads";
+import { buildDeckReference } from "@/lib/tarot";
 
 type ReadSpreadRequest = {
   imageDataUrl?: string;
@@ -52,6 +53,7 @@ export async function POST(request: Request) {
     .map((position) => `${position.number}. ${position.title}: ${position.meaning}`)
     .join("\n");
   const model = process.env.OPENAI_MODEL || "gpt-4o-mini";
+  const deckReference = buildDeckReference();
 
   const prompt = `You are Cat Tarot Companion, a warm but grounded tarot interpreter with a celestial black-cat aesthetic.
 
@@ -61,6 +63,9 @@ Positions:
 ${positionGuide}
 ${spread.note ? `Special note: ${spread.note}` : ""}
 Question: ${body.question?.trim() || "No specific question provided."}
+
+Deck-specific guidebook reference from OCR/manual summaries. Use these appearances and meanings when identifying and interpreting cards; do not default to generic tarot if this guide differs:
+${deckReference}
 
 Return only JSON with this exact shape:
 {
@@ -73,7 +78,7 @@ Return only JSON with this exact shape:
   "caveat": "A short note that image recognition can be imperfect and tarot is reflective guidance, not certainty."
 }
 
-There must be exactly ${spread.positions.length} cards in the cards array, one per position. If a card cannot be confidently identified, use "Unknown" and interpret the visual placement plus position meaning. Keep it kind, concise, and cat-themed without claiming certainty.`;
+There must be exactly ${spread.positions.length} cards in the cards array, one per position. If a card cannot be confidently identified, use "Unknown" and interpret the visual placement plus position meaning. When a card is visually identified, base its interpretation on the matching deck reference upright or reversed meaning as appropriate for the photo/orientation. Keep it kind, concise, and cat-themed without claiming certainty.`;
 
   const response = await fetch(openAiUrl, {
     method: "POST",
