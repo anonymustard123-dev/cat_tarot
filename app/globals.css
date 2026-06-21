@@ -1482,47 +1482,16 @@ body::before {
 
 .peeping-cat {
   animation: peek-bob 5.8s ease-in-out infinite;
-  aspect-ratio: 1;
-  background:
-    radial-gradient(circle at 35% 43%, #fff1a8 0 3.5%, transparent 4%),
-    radial-gradient(circle at 64% 43%, #fff1a8 0 3.5%, transparent 4%),
-    radial-gradient(circle at 35% 43%, #16072f 0 7%, transparent 7.6%),
-    radial-gradient(circle at 64% 43%, #16072f 0 7%, transparent 7.6%),
-    radial-gradient(ellipse at 50% 62%, #ffbfdc 0 7%, transparent 7.8%),
-    radial-gradient(circle at 50% 48%, #24104d 0 60%, #15072f 61% 100%);
-  border: 1px solid rgba(255, 241, 168, 0.26);
-  border-radius: 48% 48% 42% 42%;
-  bottom: -30px;
-  box-shadow:
-    0 0 36px rgba(255, 185, 221, 0.26),
-    inset 0 0 26px rgba(255, 255, 255, 0.08);
-  height: clamp(92px, 13vw, 150px);
+  background: url("/peeping-cat.svg") center bottom / contain no-repeat;
+  bottom: -18px;
+  filter: drop-shadow(0 18px 22px rgba(8, 3, 28, 0.36)) drop-shadow(0 0 20px rgba(255, 185, 221, 0.16));
+  height: clamp(150px, 20vw, 230px);
   pointer-events: none;
   position: absolute;
-  right: clamp(18px, 5vw, 72px);
+  right: clamp(8px, 4vw, 54px);
   transform: rotate(-5deg);
+  width: clamp(160px, 22vw, 250px);
   z-index: 2;
-}
-
-.peeping-cat::before,
-.peeping-cat::after {
-  background: linear-gradient(135deg, #21104a, #110627);
-  border: 1px solid rgba(255, 241, 168, 0.2);
-  content: "";
-  height: 43%;
-  position: absolute;
-  top: -17%;
-  transform: rotate(45deg);
-  width: 43%;
-  z-index: -1;
-}
-
-.peeping-cat::before {
-  left: 8%;
-}
-
-.peeping-cat::after {
-  right: 8%;
 }
 
 @keyframes peek-bob {
